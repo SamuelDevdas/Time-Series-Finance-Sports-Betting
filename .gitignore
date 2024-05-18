@@ -1,2 +1,4 @@
-csv_files
+
 .history
+.ipynb_checkpoints
+.RHistory
