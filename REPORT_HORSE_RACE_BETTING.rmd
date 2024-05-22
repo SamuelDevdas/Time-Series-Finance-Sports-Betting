@@ -159,7 +159,7 @@ process_data <- function(data_df, market_type) {
 win_results <- process_data(WIN_PRO_df_PP, "WIN")
 place_results <- process_data(PLACE_PRO_df_PP, "PLACE")
 
-Brown_Panther_PLACE_df <- win_results[["Brown_Panther"]][["data"]]
+Brown_Panther_PLACE_df <- place_results[["Brown_Panther"]][["data"]]
 Brown_Panther_WIN_df <- win_results[["Brown_Panther"]][["data"]]
 
 Brown_Panther_win_plot <- win_results[["Brown_Panther"]][["plot"]]
