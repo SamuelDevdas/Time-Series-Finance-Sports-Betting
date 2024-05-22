@@ -13,7 +13,9 @@ mainfont: Times New Roman
 fontsize: 12pt
 
 ---
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+```
 
 # Introduction
 
@@ -31,21 +33,323 @@ fontsize: 12pt
 
 *Placeholder for data collection and preprocessing content.*
 
-## Descriptive Analysis: Visualization and Data Preparation
+```{r chunk_1}
+
+# Load necessary libraries
+library(dplyr)
+library(jsonlite)
+library(lubridate)
+library(ggplot2)
+library(quantmod)
+library(lifecycle)
+library(tidyselect)
+library(tidyverse)
+library(zoo)
+library(forecast)
+library(tseries)
+
+# Load necessary libraries for VAR model
+library(tsibble)
+library(feasts)
+library(fabletools)
+
+# Read the CSV file into a dataframe
+WIN_PRO_df <- read.csv("csv_files/win_data_pro.csv")
+PLACE_PRO_df <- read.csv("csv_files/place_data_PRO.csv")
+
+# Filter only on the rows where actual trades have been made
+WIN_PRO_df <- WIN_PRO_df %>% filter(trades != "[]")
+PLACE_PRO_df <- PLACE_PRO_df %>% filter(trades != "[]")
+
+# Convert timestamp to POSIXct
+WIN_PRO_df <- WIN_PRO_df %>%
+  mutate(timestamp = as.POSIXct(timestamp_unix / 1000, origin = "1970-01-01", tz = "GMT"))
+
+PLACE_PRO_df <- PLACE_PRO_df %>%
+  mutate(timestamp = as.POSIXct(timestamp_unix / 1000, origin = "1970-01-01", tz = "GMT"))
+
+Bucket_size <- 9
+
+# Create a equal frequency bin for time
+WIN_PRO_df <- WIN_PRO_df %>%
+  mutate(time_bucket = floor(as.numeric(timestamp) / Bucket_size))
+
+PLACE_PRO_df <- PLACE_PRO_df %>%
+  mutate(time_bucket = floor(as.numeric(timestamp) / Bucket_size))
+
+# Create price column. Price is set to last traded price, which is fine because we filtered out the rows with no trades.
+#Hence price is now actual trades, and size will be worked out later for each horse.
+WIN_PRO_df <- WIN_PRO_df %>%
+  mutate(
+    price = last_traded_price
+  )
+
+PLACE_PRO_df <- PLACE_PRO_df %>%
+  mutate(
+    price = last_traded_price
+  )
+
+###Check horse IDS
+# Read the horse name data into a dataframe
+horse_names_df <- data.frame(
+  horse_id = c(8421889, 7560122, 5465145, 3415981, 5105924, 7401388),
+  horse_name = c("Romsdal", "Snow_Sky", "Havana_Beat", "Times_Up", "Brown Panther", "Island_Remede")
+)
+
+# Join the horse name data with the main dataframe
+WIN_PRO_df <- WIN_PRO_df %>%
+  left_join(horse_names_df, by = c("horse_id" = "horse_id"))
+
+PLACE_PRO_df <- PLACE_PRO_df %>%
+  left_join(horse_names_df, by = c("horse_id" = "horse_id"))
+
+# Important instances to split df
+PP_t <- "2015-05-15 16:06:18"
+IP_t <- "2015-05-15 16:16:00"
+
+
+# Split the data frame into three parts based on the given times
+WIN_PRO_df_Morning <- WIN_PRO_df %>% filter(timestamp < PP_t)
+WIN_PRO_df_PP <- WIN_PRO_df %>% filter(timestamp >= PP_t & timestamp < IP_t)
+WIN_PRO_df_IP <- WIN_PRO_df %>% filter(timestamp >= IP_t)
+
+PLACE_PRO_df_Morning <- PLACE_PRO_df %>% filter(timestamp < PP_t)
+PLACE_PRO_df_PP <- PLACE_PRO_df %>% filter(timestamp >= PP_t & timestamp < IP_t)
+PLACE_PRO_df_IP <- PLACE_PRO_df %>% filter(timestamp >= IP_t)
+```
+
+## Descriptive Analysis and Visualization
 
 *Placeholder for descriptive analysis content.*
 
-### Datapreparation
+```{r chunk_2}
+process_data <- function(data_df, market_type) {
+  results_list <- list()
+  
+  for (horse in unique(data_df$horse_name)) {
+    horse_df <- data_df %>% filter(horse_name == horse) %>%
+      group_by(time_bucket) %>%
+      summarise(mean_price = mean(price, na.rm = TRUE))
+    
+    # Save the horse-specific dataframe in a list
+    results_list[[gsub(" ", "_", horse)]] <- list(
+      data = horse_df,
+      plot = ggplot(data = horse_df, aes(x = as.POSIXct(time_bucket * Bucket_size, origin = "1970-01-01", tz = "GMT"), y = mean_price)) +
+        geom_line() +
+        geom_point() +
+        labs(
+          title = paste(market_type, "market Price Over Time for", horse),
+          x = "Time",
+          y = "Mean Price"
+        ) +
+        theme_minimal() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1),
+              legend.position = "bottom") +
+        scale_x_datetime(date_breaks = "1 min", date_labels = "%H:%M")
+    )
+    
+    # Print the plot
+    print(results_list[[gsub(" ", "_", horse)]][["plot"]])
+  }
+  
+  return(results_list)
+}
 
-*Placeholder for data preparation: returns content.*
+# Use the function for WIN and PLACE market data
+win_results <- process_data(WIN_PRO_df_PP, "WIN")
+place_results <- process_data(PLACE_PRO_df_PP, "PLACE")
+
+Brown_Panther_PLACE_df <- win_results[["Brown_Panther"]][["data"]]
+Brown_Panther_WIN_df <- win_results[["Brown_Panther"]][["data"]]
+
+Brown_Panther_win_plot <- win_results[["Brown_Panther"]][["plot"]]
+Brown_Panther_place_plot <- place_results[["Brown_Panther"]][["plot"]]
+
+
+```
+
+
+
+
+
+
+
+
+
+
+## Time Series Analysis
+
+*Placeholder for time series analysis content.*
+
+```{r chunk_3}
+# Convert 'time_bucket' to POSIXct for proper time handling
+Brown_Panther_WIN_df <- Brown_Panther_WIN_df %>%
+  mutate(timestamp = as.POSIXct(time_bucket * Bucket_size, origin = "1970-01-01", tz = "GMT"))
+
+# Check the range of the timestamp
+start_time <- min(Brown_Panther_WIN_df$timestamp)
+end_time <- max(Brown_Panther_WIN_df$timestamp)
+
+# Create a sequence of time points from start to end with a step of 6 seconds
+time_points <- seq(from = start_time, to = end_time, by = Bucket_size)
+
+# Create a complete data frame with these time points
+complete_data <- data.frame(timestamp = time_points)
+
+# Merge with the original data to ensure alignment
+complete_data <- complete_data %>%
+  left_join(Brown_Panther_WIN_df, by = "timestamp")
+
+# Fill missing prices with NA or any other method if necessary
+complete_data <- complete_data %>%
+  mutate(mean_price = ifelse(is.na(mean_price), NA, mean_price))
+
+# Check the filled price data
+summary(complete_data$mean_price)
+
+# Extract the filled price data
+filled_price_data <- complete_data$mean_price
+
+# Create the time series object
+# Use a lower frequency to match the length of the time series
+# For example, assuming a reasonable periodicity within the data length
+WIN_price_ts <- ts(filled_price_data, frequency = Bucket_size)
+
+# Check the structure and length of the time series object
+str(WIN_price_ts)
+length(WIN_price_ts)
+
+# Display the first few entries of the time series object
+head(WIN_price_ts)
+
+############################################################
+
+# Convert 'time_bucket' to POSIXct for proper time handling
+Brown_Panther_PLACE_df <- Brown_Panther_PLACE_df %>%
+  mutate(timestamp = as.POSIXct(time_bucket * Bucket_size, origin = "1970-01-01", tz = "GMT"))
+
+# Check the range of the timestamp
+start_time <- min(Brown_Panther_PLACE_df$timestamp)
+end_time <- max(Brown_Panther_PLACE_df$timestamp)
+
+# Create a sequence of time points from start to end with a step of 6 seconds
+time_points <- seq(from = start_time, to = end_time, by = Bucket_size)
+
+# Create a complete data frame with these time points
+complete_data <- data.frame(timestamp = time_points)
+
+# Merge with the original data to ensure alignment
+complete_data <- complete_data %>%
+  left_join(Brown_Panther_PLACE_df, by = "timestamp")
+
+# Fill missing prices with NA or any other method if necessary
+complete_data <- complete_data %>%
+  mutate(mean_price = ifelse(is.na(mean_price), NA, mean_price))
+
+# Check the filled price data
+summary(complete_data$mean_price)
+
+# Extract the filled price data
+filled_price_data <- complete_data$mean_price
+
+# Create the time series object
+# Use a lower frequency to match the length of the time series
+# For example, assuming a reasonable periodicity within the data length
+PLACE_price_ts <- ts(filled_price_data, frequency = Bucket_size)
+
+# Check the structure and length of the time series object
+str(PLACE_price_ts)
+length(PLACE_price_ts)
+
+# Display the first few entries of the time series object
+head(PLACE_price_ts)
+
+plot(WIN_price_ts, main="Win Price Time Series for Brown Panther", xlab="Time", ylab="Price", type="l")
+
+plot(PLACE_price_ts, main="PLACE Price Time Series for Brown Panther", xlab="Time", ylab="Price", type="l")
+```
 
 ### Stationarity
 
 *Placeholder for stationarity content.*
 
+```{r chunk_6}
+adf_test_result <- adf.test(WIN_price_ts, alternative = "stationary")
+print(adf_test_result)
+
+adf_test_result_2 <- adf.test(PLACE_price_ts, alternative = "stationary")
+print(adf_test_result_2)
+```
+
+Its not stationary. Therefore we need to break it down and to understand the underlying components.
+
+```{r chunk_7}
+# Step 5: Decomposition of Time Series (if seasonal patterns expected)
+decomposed <- stl(WIN_price_ts, s.window = "periodic")
+plot(decomposed)
+
+decomposed_2 <- stl(PLACE_price_ts, s.window = "periodic")
+plot(decomposed_2)
+```
+
+```{r chunk_8}
+# Step 6: Differencing 
+Brown_Panther_W_diff1 <- diff(Brown_Panther_WIN_df$mean_price, lag = 1)
+
+Brown_Panther_P_diff1 <- diff(Brown_Panther_PLACE_df$mean_price, lag = 1)
+
+# Step 7: ADF Test to check stationarity after differencing
+adf_result_diff <- adf.test(Brown_Panther_W_diff1, alternative = "stationary")
+print(adf_result_diff)
+
+adf_result_diff_P <- adf.test(Brown_Panther_P_diff1, alternative = "stationary")
+print(adf_result_diff_P)
+```
+
+P-Value > 0.05, hence we take do another differential
+
+```{r chunk_9}
+# Step 8: Second Differencing
+Brown_Panther_W_diff2 <- diff(Brown_Panther_W_diff1, lag = 1)
+
+Brown_Panther_P_diff2 <- diff(Brown_Panther_P_diff1, lag = 1)
+
+# Step 9: ADF Test to check stationarity after second differencing
+adf.test(Brown_Panther_W_diff2, alternative = "stationary")
+
+adf.test(Brown_Panther_P_diff2, alternative = "stationary")
+```
+
+
 ### VAR-Modell and Granger Causality
 
 *Placeholder for VAR model and Granger causality content.*
+
+```{r chunk_10}
+# Step 10: Estimation of VAR Model
+library(vars)
+library(tseries)
+library(quantmod)
+
+# Check the size of both the time series
+
+length(Brown_Panther_W_diff2)
+length(Brown_Panther_P_diff2)
+```
+
+```{r chunk_11}
+# Estimating vector autoregression and testing for causality
+
+VAR_est <- VAR(cbind(Brown_Panther_W_diff2,Brown_Panther_P_diff2), ic="AIC", lag.max = 3)
+coeftest(VAR_est)
+causality(VAR_est, cause="Brown_Panther_W_diff2")["Granger"]
+causality(VAR_est, cause="Brown_Panther_P_diff2")["Granger"]
+
+summary(VAR_est)
+
+# Interpretation: The Granger-causality test states that at the 95% confidence interval, oil returns do significantly Granger-cause the inflation rate but not vice versa.
+```
+
 
 # Results
 
@@ -53,6 +357,30 @@ fontsize: 12pt
 
 # Appendix
 
-*Placeholder for appendix content.*
+1. Packages used in this report: 
+
+```{r chunk_12}
+# install.packages('dplyr')
+# install.packages('jsonlite')
+# install.packages('lubridate')
+# install.packages('ggplot2')
+# install.packages('quantmod')
+# install.packages('lifecycle')
+# install.packages('tidyselect')
+# install.packages("tidyverse")
+# install.packages("zoo")
+
+# Install necessary packages for VAR model
+# install.packages("tsibble")
+# install.packages("feasts")
+# install.packages("fabletools")
+
+```
+
+2. Code used to download the data:
+
+```{r chunk_13}
+
+```
 
 
