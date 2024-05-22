@@ -13,9 +13,12 @@ mainfont: Times New Roman
 fontsize: 12pt
 
 ---
-```{r setup, include=FALSE, echo=FALSE}}
-knitr::opts_chunk$set(cache = TRUE)
+
+```{r setup, include=FALSE, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, results='hide', tidy = TRUE}
+knitr::opts_chunk$set(cache = TRUE, echo = FALSE, results = 'hide', warning = FALSE, message = FALSE, fig.show = 'hide')
 ```
+
+
 
 # Introduction
 
@@ -384,6 +387,3 @@ summary(VAR_est)
 ```{r chunk_13}
 
 ```
-
-
-##See if this is the latest
