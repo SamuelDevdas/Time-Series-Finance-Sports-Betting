@@ -22,7 +22,10 @@ knitr::opts_chunk$set(cache = TRUE, echo = FALSE, results = 'hide', warning = FA
 
 # Introduction
 
-*Placeholder for introduction content.*
+Betting markets, and especially horse racing markets, are well suited for testing market efficiency, human rationality (including bias formation and classification), and time series-related algorithms(Lewis & Magee, 2011). The vast availability of live and historical data, such as prices (odds and the size of placed bets), provides a rich source for technical analysis. Additionally, other information, such as a horse’s recent form, genetics, and race conditions, can be used for fundamental analysis. Each bet has a specified termination point when its asset value is determined(Hausch & Ziemba, 2008).
+
+This study focuses on the price data (specifically the odds and their implied probability) and its movement during the final minutes before a race starts. Actual trades were considered as the market price. To generate as many data points as possible, we chose the markets and times of the races with the highest liquidity.
+
 
 # Literature Review
 
