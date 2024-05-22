@@ -13,7 +13,7 @@ mainfont: Times New Roman
 fontsize: 12pt
 
 ---
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo=FALSE}}
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -354,6 +354,8 @@ summary(VAR_est)
 # Results
 
 *Placeholder for results content.*
+
+# References
 
 # Appendix
 
