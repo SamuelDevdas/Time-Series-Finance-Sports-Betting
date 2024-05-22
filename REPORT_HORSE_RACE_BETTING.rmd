@@ -388,6 +388,25 @@ summary(VAR_est)
 
 *Placeholder for results content.*
 
+## VAR Model Estimation Results
+
+### Model Specifications:
+Vector Autoregression (VAR) modeled the interdependencies between changes in winning and placing odds for Brown Panther. Analyzed variables were differences of winning odds (\(W_{diff2}\)) and placing odds (\(P_{diff2}\)), with a constant included.
+
+### Estimated Equations:
+Winning Odds: W_diff2 = -0.662(W_diff2.l1) - 0.540(W_diff2.l2) - 0.346(W_diff2.l3) + 0.198(P_diff2.l1) + 0.022(P_diff2.l2) - 0.175(P_diff2.l3) + 0.00054(const)
+Placing Odds: P_diff2 = 0.077(W_diff2.l1) + 0.037(W_diff2.l2) - 0.004(W_diff2.l3) - 0.669(P_diff2.l1) - 0.564(P_diff2.l2) - 0.251(P_diff2.l3) + 0.00038(const)
+
+### Statistical Insights:
+Significant predictors included \(W_{diff2.l1}\), \(W_{diff2.l2}\), \(P_{diff2.l1}\) for winning odds, and \(P_{diff2.l1}\), \(P_{diff2.l2}\) for placing odds, indicating a strong past influence on present odds.
+
+### Model Performance:
+Multiple R-squared values were 35.41% for winning odds and 31.36% for placing odds. Both models' F-statistics confirmed statistical significance, validating the model's predictive reliability.
+
+### Interpretation:
+Significant negative coefficients suggest a mean-reverting dynamic in odds behavior, influenced by historical data. The positive correlation (0.6115) between the models' residuals underscores interconnected market movements.
+
+
 # References
 
 # Figures
@@ -415,6 +434,12 @@ summary(VAR_est)
 ![Image 10](figures/image%20copy%2010.png)
 
 ![Image 11](figures/image%20copy%2011.png)
+
+![adf raw ts](figures/adf1.png)
+
+![adf diff 1](figures/adf_diff1.png)
+
+![adf diff 2](figures/adf_diff2.png)
 
 
 # Appendix
