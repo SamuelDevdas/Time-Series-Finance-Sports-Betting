@@ -1,0 +1,58 @@
+---
+title: "HORSE RACE BETTING: TIME SERIES ANALYSIS AND MODELLING OF WINNING ODDS ON PLACING ODDS"
+author: "RONALD SCHWALB AND SAMUEL DEVDAS"
+date: "MAY 24, 2024"
+output: 
+  pdf_document:
+    toc: true
+    number_sections: true
+    highlight: tango
+    fig_caption: true
+    
+mainfont: Times New Roman
+fontsize: 12pt
+
+---
+
+
+# Introduction
+
+*Placeholder for introduction content.*
+
+# Literature Review
+
+*Placeholder for literature review content.*
+
+# Methods
+
+*Placeholder for methods content.*
+
+## Data Collection and Preprocessing
+
+*Placeholder for data collection and preprocessing content.*
+
+## Descriptive Analysis: Visualization and Data Preparation
+
+*Placeholder for descriptive analysis content.*
+
+### Datapreparation
+
+*Placeholder for data preparation: returns content.*
+
+### Stationarity
+
+*Placeholder for stationarity content.*
+
+### VAR-Modell and Granger Causality
+
+*Placeholder for VAR model and Granger causality content.*
+
+# Results
+
+*Placeholder for results content.*
+
+# Appendix
+
+*Placeholder for appendix content.*
+
+
