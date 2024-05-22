@@ -1,13 +1,16 @@
 ---
-title: "HORSE RACE BETTING: TIME SERIES ANALYSIS AND MODELLING OF WINNING ODDS ON PLACING ODDS"
-author: "RONALD SCHWALB AND SAMUEL DEVDAS"
-date: "MAY 24, 2024"
+title: "Horse Race Betting: Time Series Analysis and Modelling of Winning Odds on Placing Odds"
+author: "Ronald Schwalb and Samuel Devdas"
+date: "May 24, 2024"
 output: 
   pdf_document:
     toc: true
     number_sections: true
     highlight: tango
     fig_caption: true
+header-includes:
+  - \usepackage{caption}  # Include the caption package
+  - \captionsetup[figure]{font=small}  # Set caption font size to small
     
 mainfont: Times New Roman
 fontsize: 12pt
@@ -174,14 +177,23 @@ Brown_Panther_place_plot <- place_results[["Brown_Panther"]][["plot"]]
 
 ```
 
+*Placeholder for time series analysis content.*
 
-
-
-
-
-
-
-
+\begin{figure}[!htb]
+\centering
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.95\linewidth]{figures/image12.png}
+  \caption{Win Price Time Series for Brown Panther}
+  \label{fig:winprice}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.95\linewidth]{figures/image13.png}
+  \caption{Place Price Time Series for Brown Panther}
+  \label{fig:placeprice}
+\end{minipage}
+\end{figure}
 
 ## Time Series Analysis
 
@@ -277,7 +289,23 @@ plot(PLACE_price_ts, main="PLACE Price Time Series for Brown Panther", xlab="Tim
 
 ### Stationarity
 
-*Placeholder for stationarity content.*
+Its not stationary. Therefore we need to break it down and to understand the underlying components.
+
+\begin{figure}[!htb]
+\centering
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.95\linewidth]{figures/stl_win.png}
+  \caption{STL Win Price Brown Panther}
+  \label{fig:stlwin}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.95\linewidth]{figures/stl_place.png}
+  \caption{STL Place Price Brown Panther}
+  \label{fig:stlplace}
+\end{minipage}
+\end{figure}
 
 ```{r chunk_6}
 adf_test_result <- adf.test(WIN_price_ts, alternative = "stationary")
@@ -287,7 +315,6 @@ adf_test_result_2 <- adf.test(PLACE_price_ts, alternative = "stationary")
 print(adf_test_result_2)
 ```
 
-Its not stationary. Therefore we need to break it down and to understand the underlying components.
 
 ```{r chunk_7}
 # Step 5: Decomposition of Time Series (if seasonal patterns expected)
@@ -363,6 +390,33 @@ summary(VAR_est)
 
 # References
 
+# Figures
+
+![Image 0](figures/image%200.png)
+
+![Image 1](figures/image%20copy%201.png)
+
+![Image 2](figures/image%20copy%202.png)
+
+![Image 3](figures/image%20copy%203.png)
+
+![Image 4](figures/image%20copy%204.png)
+
+![Image 5](figures/image%20copy%205.png)
+
+![Image 6](figures/image%20copy%206.png)
+
+![Image 7](figures/image%20copy%207.png)
+
+![Image 8](figures/image%20copy%208.png)
+
+![Image 9](figures/image%20copy%209.png)
+
+![Image 10](figures/image%20copy%2010.png)
+
+![Image 11](figures/image%20copy%2011.png)
+
+
 # Appendix
 
 1. Packages used in this report: 
@@ -385,8 +439,3 @@ summary(VAR_est)
 
 ```
 
-2. Code used to download the data:
-
-```{r chunk_13}
-
-```
