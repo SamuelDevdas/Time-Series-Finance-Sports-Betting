@@ -9,42 +9,42 @@ output:
     highlight: tango
     fig_caption: true
 header-includes:
-  - \usepackage{caption}  # Include the caption package
-  - \captionsetup[figure]{font=small}  # Set caption font size to small
-    
-mainfont: Times New Roman
+  - \usepackage{caption}
+  - \captionsetup[figure]{font=small}
+mainfont: "Times New Roman"
 fontsize: 12pt
-
 ---
+
 
 ```{r setup, include=FALSE, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, results='hide', tidy = TRUE}
 knitr::opts_chunk$set(cache = TRUE, echo = FALSE, results = 'hide', warning = FALSE, message = FALSE, fig.show = 'hide')
+
 ```
-
-
 
 # Introduction
 
-#Betting markets on betting exchanges are well suited for testing market efficiency, human rationality (including bias formation and classification), and time series-related algorithms(Lewis & Magee, 2011). Horse racing markets are especially useful for such analyses, as they are in abundance, liquid and fast to get results. The vast availability of live and historical data, such as prices (odds and the size of placed bets), provides a rich source for technical analysis. Additionally, other information, such as a horse’s recent form, genetics, and race conditions, can be used for fundamental analysis. Each bet has a specified termination point when its asset value is determined(Hausch & Ziemba, 2008).
-#This study analyses the price data, specifically the odds and their implied probability on win and place markets for horse races. It focusses on the movement during the final minutes before a race starts. Actual trades were considered as the market price. To generate as many data points as possible, we chose the markets and times of the races with the highest liquidity. Data from Betfair, the world’s biggest betting exchange, is used, where the markets are much more efficient than at traditional bookmakers (Franck et al., 2013).
-
+Betting markets on betting exchanges are well suited for testing market efficiency, human rationality (including bias formation and classification), and time series-related algorithms(Lewis & Magee, 2011). Horse racing markets are especially useful for such analyses, as they are in abundance, liquid and fast to get results. The vast availability of live and historical data, such as prices (odds and the size of placed bets), provides a rich source for technical analysis. Additionally, other information, such as a horse’s recent form, genetics, and race conditions, can be used for fundamental analysis. Each bet has a specified termination point when its asset value is determined(Hausch & Ziemba, 2008).
+  
+This study analyses the price data, specifically the odds and their implied probability on win and place markets for horse races. It focusses on the movement during the final minutes before a race starts. Actual trades were considered as the market price. To generate as many data points as possible, we chose the markets and times of the races with the highest liquidity. Data from Betfair, the world’s biggest betting exchange, is used, where the markets are much more efficient than at traditional bookmakers (Franck et al., 2013).  
 
 # Literature Review
 
-#Models that utilize win-market probabilities to predict place-market probabilities in horse racing have been developed and refined over the years. Two of the most notable models are Harville’s model, introduced in 1973, and Henery’s model, proposed in 1981. The Harville model is the simplest  model, and have been successfully implemented I the past (Hausch & Ziemba, 2008). It does however have a systemic bias of overestimating the placing probabilities of the favourite horses.
-#Time study analyses on Horse racing markets have been conducted and published. During this literature review, no publications were found that focusses on the causal relationships between different markets e.g. the win and place markets. (Tondapu, 2024) concluded that autocorrelation decays quickly, indicating high information efficiency however some volatility clustering are present indicating weaker efficiency.
+Models that utilize win-market probabilities to predict place-market probabilities in horse racing have been developed and refined over the years. Two of the most notable models are Harville’s model, introduced in 1973, and Henery’s model, proposed in 1981. The Harville model is the simplest  model, and have been successfully implemented I the past (Hausch & Ziemba, 2008). It does however have a systemic bias of overestimating the placing probabilities of the favourite horses.
 
+Time study analyses on Horse racing markets have been conducted and published. During this literature review, no publications were found that focusses on the causal relationships between different markets e.g. the win and place markets. (Tondapu, 2024) concluded that autocorrelation decays quickly, indicating high information efficiency however some volatility clustering are present indicating weaker efficiency.  
 
 # Methods
 
-#The observation that place-markets are less liquid than win markets in horse racing has led to the hypothesis that win markets are more efficient, have a causal relationship with place markets, and can therefore be used for price discovery and market creation. The reasoning behind this hypothesis is based on the following points: 
-#1)	There are bigger spreads present in the place markets and desperate punters will bet at these spreads. 
-#2)	Information is assumed to reflect faster in liquid markets as more participants are trading.
-#The authors were so confident in this hypothesis that they developed a model in R, which connects to Betfair’s API to stream live win-market odds. They applied the Harville method to place bets in the place markets. The betting amounts were determined using the Kelly criterion, which balances risk and reward to optimize wealth. 
-#This was an example of a model being applied in the “danger zone” of Drew Conway’s data science Venn diagram (Conway, Drew, 2010). A contributing factor for "putting the cart before the horses", is that to live stream data through the Betfair API, is that one should place bets to have access. It cannot be used only to retrieve data, required for the analysis.
+The observation that place-markets are less liquid than win markets in horse racing has led to the hypothesis that win markets are more efficient, have a causal relationship with place markets, and can therefore be used for price discovery and market creation. The reasoning behind this hypothesis is based on the following points:  
 
-#The approach was changed, and the authors decided to perform time series analysis on historic data. The methods used were:
+1. There are bigger spreads present in the place markets and desperate punters will bet at these spreads.
+2. Information is assumed to reflect faster in liquid markets as more participants are trading.  
 
+The authors were so confident in this hypothesis that they developed a model in R, which connects to Betfair’s API to stream live win-market odds. They applied the Harville method to place bets in the place markets. The betting amounts were determined using the Kelly criterion, which balances risk and reward to optimize wealth.
+
+This was an example of a model being applied in the “danger zone” of Drew Conway’s data science Venn diagram (Conway, Drew, 2010). A contributing factor for "putting the cart before the horses", is that to live stream data through the Betfair API, is that one should place bets to have access. It cannot be used only to retrieve data, required for the analysis.  
+
+The approach was changed, and the authors decided to perform time series analysis on historic data. The methods used were:  
 
 ## Data Collection and Preprocessing
 
@@ -124,7 +124,6 @@ PLACE_PRO_df <- PLACE_PRO_df %>%
 PP_t <- "2015-05-15 16:06:18"
 IP_t <- "2015-05-15 16:16:00"
 
-
 # Split the data frame into three parts based on the given times
 WIN_PRO_df_Morning <- WIN_PRO_df %>% filter(timestamp < PP_t)
 WIN_PRO_df_PP <- WIN_PRO_df %>% filter(timestamp >= PP_t & timestamp < IP_t)
@@ -137,42 +136,45 @@ PLACE_PRO_df_IP <- PLACE_PRO_df %>% filter(timestamp >= IP_t)
 
 ## Descriptive Analysis and Visualization
 
-*Placeholder for descriptive analysis content.*
+Data was segmented by horse and market type (WIN, PLACE) to compute time-bucketed mean prices. Each horse's data was summarized over defined time buckets, and visualized to display price trends over time.
 
 ```{r chunk_2}
 process_data <- function(data_df, market_type) {
   results_list <- list()
   
   for (horse in unique(data_df$horse_name)) {
+
     horse_df <- data_df %>% filter(horse_name == horse) %>%
       group_by(time_bucket) %>%
       summarise(mean_price = mean(price, na.rm = TRUE))
     
     # Save the horse-specific dataframe in a list
     results_list[[gsub(" ", "_", horse)]] <- list(
-      data = horse_df,
+      data = horse_df, 
       plot = ggplot(data = horse_df, aes(x = as.POSIXct(time_bucket * Bucket_size, origin = "1970-01-01", tz = "GMT"), y = mean_price)) +
         geom_line() +
         geom_point() +
         labs(
-          title = paste(market_type, "market Price Over Time for", horse),
-          x = "Time",
+          title = paste(market_type, "market Price Over Time for", horse), 
+          x = "Time", 
           y = "Mean Price"
         ) +
         theme_minimal() +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        theme(axis.text.x = element_text(angle = 45, hjust = 1), 
               legend.position = "bottom") +
         scale_x_datetime(date_breaks = "1 min", date_labels = "%H:%M")
     )
     
     # Print the plot
     print(results_list[[gsub(" ", "_", horse)]][["plot"]])
+
   }
   
   return(results_list)
 }
 
 # Use the function for WIN and PLACE market data
+
 win_results <- process_data(WIN_PRO_df_PP, "WIN")
 place_results <- process_data(PLACE_PRO_df_PP, "PLACE")
 
@@ -182,10 +184,7 @@ Brown_Panther_WIN_df <- win_results[["Brown_Panther"]][["data"]]
 Brown_Panther_win_plot <- win_results[["Brown_Panther"]][["plot"]]
 Brown_Panther_place_plot <- place_results[["Brown_Panther"]][["plot"]]
 
-
 ```
-
-*Placeholder for time series analysis content.*
 
 \begin{figure}[!htb]
 \centering
@@ -205,7 +204,7 @@ Brown_Panther_place_plot <- place_results[["Brown_Panther"]][["plot"]]
 
 ## Time Series Analysis
 
-*Placeholder for time series analysis content.*
+Data timestamps were standardized using `POSIXct`, structured to ensure no time gaps for continuous analysis. Time series for WIN and PLACE markets were created with uniform frequency settings, filled with NA for missing values.
 
 ```{r chunk_3}
 # Convert 'time_bucket' to POSIXct for proper time handling
@@ -295,9 +294,9 @@ plot(WIN_price_ts, main="Win Price Time Series for Brown Panther", xlab="Time", 
 plot(PLACE_price_ts, main="PLACE Price Time Series for Brown Panther", xlab="Time", ylab="Price", type="l")
 ```
 
-### Stationarity
+## Stationarity
 
-Its not stationary. Therefore we need to break it down and to understand the underlying components.
+The stationarity of WIN and PLACE price time series for Brown Panther was evaluated using the Augmented Dickey-Fuller (ADF) test, confirming non-stationarity as initial tests indicated p-values greater than 0.05. Subsequent decomposition using STL revealed seasonal components, depicted in plots for both markets. To achieve stationarity, first and second differencing were applied, followed by repeated ADF tests to assess each step's effectiveness in stabilizing the series.  
 
 \begin{figure}[!htb]
 \centering
@@ -321,8 +320,8 @@ print(adf_test_result)
 
 adf_test_result_2 <- adf.test(PLACE_price_ts, alternative = "stationary")
 print(adf_test_result_2)
-```
 
+```
 
 ```{r chunk_7}
 # Step 5: Decomposition of Time Series (if seasonal patterns expected)
@@ -334,20 +333,22 @@ plot(decomposed_2)
 ```
 
 ```{r chunk_8}
+
 # Step 6: Differencing 
+
 Brown_Panther_W_diff1 <- diff(Brown_Panther_WIN_df$mean_price, lag = 1)
 
 Brown_Panther_P_diff1 <- diff(Brown_Panther_PLACE_df$mean_price, lag = 1)
 
 # Step 7: ADF Test to check stationarity after differencing
+
 adf_result_diff <- adf.test(Brown_Panther_W_diff1, alternative = "stationary")
 print(adf_result_diff)
 
 adf_result_diff_P <- adf.test(Brown_Panther_P_diff1, alternative = "stationary")
 print(adf_result_diff_P)
-```
 
-P-Value > 0.05, hence we take do another differential
+```
 
 ```{r chunk_9}
 # Step 8: Second Differencing
@@ -361,13 +362,14 @@ adf.test(Brown_Panther_W_diff2, alternative = "stationary")
 adf.test(Brown_Panther_P_diff2, alternative = "stationary")
 ```
 
+# VAR-Model and Granger Causality
 
-### VAR-Modell and Granger Causality
-
-*Placeholder for VAR model and Granger causality content.*
+The Vector Autoregression (VAR) Model and Granger causality tests were conducted to explore relationships between the second differenced WIN and PLACE price time series of Brown Panther.  The VAR model was estimated considering up to three lags based on the Akaike Information Criterion (AIC). Granger causality tests were applied to determine the directional influences between the series.
 
 ```{r chunk_10}
+
 # Step 10: Estimation of VAR Model
+
 library(vars)
 library(tseries)
 library(quantmod)
@@ -376,6 +378,7 @@ library(quantmod)
 
 length(Brown_Panther_W_diff2)
 length(Brown_Panther_P_diff2)
+
 ```
 
 ```{r chunk_11}
@@ -388,32 +391,22 @@ causality(VAR_est, cause="Brown_Panther_P_diff2")["Granger"]
 
 summary(VAR_est)
 
-# Interpretation: The Granger-causality test states that at the 95% confidence interval, oil returns do significantly Granger-cause the inflation rate but not vice versa.
 ```
 
+# Results  
 
-# Results
+## VAR Model Estimation Results  
 
-*Placeholder for results content.*
+**Model Specifications**: Vector Autoregression (VAR) modeled the interdependencies between changes in winning and placing odds for Brown Panther. Analyzed variables were differences of winning odds (\(W_{diff2}\)) and placing odds (\(P_{diff2}\)), with a constant included.  
 
-## VAR Model Estimation Results
+**Estimated Equations**: Winning Odds: W_diff2 = -0.662(W_diff2.l1) - 0.540(W_diff2.l2) - 0.346(W_diff2.l3) + 0.198(P_diff2.l1) + 0.022(P_diff2.l2) - 0.175(P_diff2.l3) + 0.00054(const)
+Placing Odds: P_diff2 = 0.077(W_diff2.l1) + 0.037(W_diff2.l2) - 0.004(W_diff2.l3) - 0.669(P_diff2.l1) - 0.564(P_diff2.l2) - 0.251(P_diff2.l3) + 0.00038(const)  
 
-### Model Specifications:
-Vector Autoregression (VAR) modeled the interdependencies between changes in winning and placing odds for Brown Panther. Analyzed variables were differences of winning odds (\(W_{diff2}\)) and placing odds (\(P_{diff2}\)), with a constant included.
+**Statistical Insights**: Significant predictors included \(W_{diff2.l1}\), \(W_{diff2.l2}\), \(P_{diff2.l1}\) for winning odds, and \(P_{diff2.l1}\), \(P_{diff2.l2}\) for placing odds, indicating a strong past influence on present odds.  
 
-### Estimated Equations:
-Winning Odds: W_diff2 = -0.662(W_diff2.l1) - 0.540(W_diff2.l2) - 0.346(W_diff2.l3) + 0.198(P_diff2.l1) + 0.022(P_diff2.l2) - 0.175(P_diff2.l3) + 0.00054(const)
-Placing Odds: P_diff2 = 0.077(W_diff2.l1) + 0.037(W_diff2.l2) - 0.004(W_diff2.l3) - 0.669(P_diff2.l1) - 0.564(P_diff2.l2) - 0.251(P_diff2.l3) + 0.00038(const)
+**Model Performance**: Multiple R-squared values were 35.41% for winning odds and 31.36% for placing odds. Both models' F-statistics confirmed statistical significance, validating the model's predictive reliability.  
 
-### Statistical Insights:
-Significant predictors included \(W_{diff2.l1}\), \(W_{diff2.l2}\), \(P_{diff2.l1}\) for winning odds, and \(P_{diff2.l1}\), \(P_{diff2.l2}\) for placing odds, indicating a strong past influence on present odds.
-
-### Model Performance:
-Multiple R-squared values were 35.41% for winning odds and 31.36% for placing odds. Both models' F-statistics confirmed statistical significance, validating the model's predictive reliability.
-
-### Interpretation:
-Significant negative coefficients suggest a mean-reverting dynamic in odds behavior, influenced by historical data. The positive correlation (0.6115) between the models' residuals underscores interconnected market movements.
-
+**Interpretation**: Significant negative coefficients suggest a mean-reverting dynamic in odds behavior, influenced by historical data. The positive correlation (0.6115) between the models' residuals underscores interconnected market movements.  
 
 # References
 
@@ -449,26 +442,36 @@ Significant negative coefficients suggest a mean-reverting dynamic in odds behav
 
 ![adf diff 2](figures/adf_diff2.png)
 
-
 # Appendix
 
-1. Packages used in this report: 
+1. Packages used in this report:
 
 ```{r chunk_12}
+
 # install.packages('dplyr')
+
 # install.packages('jsonlite')
+
 # install.packages('lubridate')
+
 # install.packages('ggplot2')
+
 # install.packages('quantmod')
+
 # install.packages('lifecycle')
+
 # install.packages('tidyselect')
+
 # install.packages("tidyverse")
+
 # install.packages("zoo")
 
 # Install necessary packages for VAR model
+
 # install.packages("tsibble")
+
 # install.packages("feasts")
+
 # install.packages("fabletools")
 
 ```
-
