@@ -40,8 +40,8 @@ Time study analyses on Horse racing markets have been conducted and published. D
 
 The observation that place-markets are less liquid than win markets in horse racing has led to the hypothesis that win markets are more efficient, have a causal relationship with place markets, and can therefore be used for price discovery and market creation. The reasoning behind this hypothesis is based on the following points:  
 
-1)	There are bigger spreads present in the place markets and desperate punters will bet at these spreads. 
-2)	Information is assumed to reflect faster in liquid markets as more participants are trading.  
+1) There are bigger spreads present in the place markets and desperate punters will bet at these spreads. 
+2) Information is assumed to reflect faster in liquid markets as more participants are trading.  
 
 The authors were so confident in this hypothesis that they developed a model in R, which connects to Betfair’s API to stream live win-market odds. They applied the Harville method to place bets in the place markets. The betting amounts were determined using the Kelly criterion, which balances risk and reward to optimize wealth.  
 
@@ -216,7 +216,7 @@ Brown_Panther_place_plot <- place_results[["Brown_Panther"]][["plot"]]
 \end{minipage}
 \end{figure}
 
-## Time Series Analysis
+## Time Series Analysis and Stationarity
 
 Data timestamps were standardized using `POSIXct`, structured to ensure no time gaps for continuous analysis. Time series for WIN and PLACE markets were created with uniform frequency settings, filled with NA for missing values.
 
@@ -307,8 +307,6 @@ plot(WIN_price_ts, main="Win Price Time Series for Brown Panther", xlab="Time", 
 
 plot(PLACE_price_ts, main="PLACE Price Time Series for Brown Panther", xlab="Time", ylab="Price", type="l")
 ```
-
-## Stationarity
 
 The stationarity of WIN and PLACE price time series for Brown Panther was evaluated using the Augmented Dickey-Fuller (ADF) test, confirming non-stationarity as initial tests indicated p-values greater than 0.05. Subsequent decomposition using STL revealed seasonal components, depicted in plots for both markets. To achieve stationarity, first and second differencing were applied, followed by repeated ADF tests to assess each step's effectiveness in stabilizing the series.  
 
@@ -409,11 +407,11 @@ summary(VAR_est)
 
 ```
 
-### VAR Model Estimation Results
+## VAR Model Estimation Results
 
 A VAR model was applied to Brown Panther's differenced WIN and PLACE price data across 60 observations, considering up to 6 lags as suggested by the Akaike Information Criterion (AIC). The analysis revealed significant lagged interactions within and between the two markets, offering predictive insights into price movements.
 
-#### Key Findings:
+### Key Findings:
 - **WIN Prices Dynamics:**
   - Significant negative coefficients at lags 1 and 2 demonstrate a mean-reverting behavior in WIN prices.
   - PLACE prices showed limited influence on WIN prices, indicating minimal cross-market effects.
@@ -422,7 +420,7 @@ A VAR model was applied to Brown Panther's differenced WIN and PLACE price data 
   - Strong self-reversion in PLACE prices evident from significant negative coefficients at lags 1 and 2.
   - Minimal influence from WIN prices, emphasizing market-specific dynamics.
 
-#### Model Diagnostics and Statistical Significance:
+### Model Diagnostics and Statistical Significance:
 - **Model Stability:** Confirmed by roots of the characteristic polynomial all lying within the unit circle.
 - **Residuals Analysis:** Low covariance and a moderate correlation of 0.6115 between residuals suggest a good model fit but highlight some unexplained interactions.
 - **Adjusted R-squared:** Values of 0.281 for WIN and 0.2359 for PLACE indicate moderate explanatory power.
@@ -433,7 +431,17 @@ A VAR model was applied to Brown Panther's differenced WIN and PLACE price data 
 The VAR analysis underscores the mean-reverting nature of both WIN and PLACE markets, with past price changes serving as strong predictors for future prices. The observed dynamics are predominantly market-specific with limited inter-market dependencies. This understanding enhances strategic betting decisions, leveraging historical data to predict future odds movements effectively. The hypothesis that win markets are more efficient, have a causal relationship with place markets, and can therefore be used for price discovery and market creation is rejected based on this analysis. The win-price and place-price for Brown Panther has a correlation of 0.95 however as mentioned very little causality. This is yet another example that demonstrates that correlation does not imply causation.
 
 
-# Figures
+# Appendix
+
+![place market efficiency](figures/place-market-efficiency.png)
+
+![place market efficiency 2](figures/place-market-efficiency2.png)
+
+![win market efficiency](figures/win-market-efficiency.png)
+
+![win market efficiency 2](figures/win-market-efficiency2.png)
+
+![win place market liquidity](figures/win-place-market-liquidity.png)
 
 ![Image 0](figures/image%200.png)
 
@@ -469,9 +477,7 @@ The VAR analysis underscores the mean-reverting nature of both WIN and PLACE mar
 
 ![VAR Summary 2](figures/var2.png)
 
-# Appendix
 
-1. Packages used in this report:
 
 ```{r chunk_12}
 
