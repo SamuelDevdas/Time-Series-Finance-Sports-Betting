@@ -24,7 +24,7 @@ knitr::opts_chunk$set(cache = TRUE, echo = FALSE, results = 'hide', warning = FA
 # Introduction
 
 Betting markets on betting exchanges are well suited for testing market efficiency, human rationality (including bias formation and classification), and time series-related algorithms(Lewis & Magee, 2011). Horse racing markets are especially useful for such analyses, as they are in abundance, liquid and fast to get results. The vast availability of live and historical data, such as prices (odds and the size of placed bets), provides a rich source for technical analysis. Additionally, other information, such as a horse’s recent form, genetics, and race conditions, can be used for fundamental analysis. Each bet has a specified termination point when its asset value is determined(Hausch & Ziemba, 2008).
-  
+
 This study analyses the price data, specifically the odds and their implied probability on win and place markets for horse races. It focusses on the movement during the final minutes before a race starts. Actual trades were considered as the market price. To generate as many data points as possible, we chose the markets and times of the races with the highest liquidity. Data from Betfair, the world’s biggest betting exchange, is used, where the markets are much more efficient than at traditional bookmakers (Franck et al., 2013).  
 
 # Literature Review
@@ -393,22 +393,29 @@ summary(VAR_est)
 
 ```
 
-# Results  
+### VAR Model Estimation Results
 
-## VAR Model Estimation Results  
+A VAR model was applied to Brown Panther's differenced WIN and PLACE price data across 60 observations, considering up to 6 lags as suggested by the Akaike Information Criterion (AIC). The analysis revealed significant lagged interactions within and between the two markets, offering predictive insights into price movements.
 
-**Model Specifications**: Vector Autoregression (VAR) modeled the interdependencies between changes in winning and placing odds for Brown Panther. Analyzed variables were differences of winning odds (\(W_{diff2}\)) and placing odds (\(P_{diff2}\)), with a constant included.  
+#### Key Findings:
+- **WIN Prices Dynamics:**
+  - Significant negative coefficients at lags 1 and 2 demonstrate a mean-reverting behavior in WIN prices.
+  - PLACE prices showed limited influence on WIN prices, indicating minimal cross-market effects.
 
-**Estimated Equations**: Winning Odds: W_diff2 = -0.662(W_diff2.l1) - 0.540(W_diff2.l2) - 0.346(W_diff2.l3) + 0.198(P_diff2.l1) + 0.022(P_diff2.l2) - 0.175(P_diff2.l3) + 0.00054(const)
-Placing Odds: P_diff2 = 0.077(W_diff2.l1) + 0.037(W_diff2.l2) - 0.004(W_diff2.l3) - 0.669(P_diff2.l1) - 0.564(P_diff2.l2) - 0.251(P_diff2.l3) + 0.00038(const)  
+- **PLACE Prices Dynamics:**
+  - Strong self-reversion in PLACE prices evident from significant negative coefficients at lags 1 and 2.
+  - Minimal influence from WIN prices, emphasizing market-specific dynamics.
 
-**Statistical Insights**: Significant predictors included \(W_{diff2.l1}\), \(W_{diff2.l2}\), \(P_{diff2.l1}\) for winning odds, and \(P_{diff2.l1}\), \(P_{diff2.l2}\) for placing odds, indicating a strong past influence on present odds.  
+#### Model Diagnostics and Statistical Significance:
+- **Model Stability:** Confirmed by roots of the characteristic polynomial all lying within the unit circle.
+- **Residuals Analysis:** Low covariance and a moderate correlation of 0.6115 between residuals suggest a good model fit but highlight some unexplained interactions.
+- **Adjusted R-squared:** Values of 0.281 for WIN and 0.2359 for PLACE indicate moderate explanatory power.
+- **F-statistics:** Statistically significant across both equations, validating the model's predictive reliability.
 
-**Model Performance**: Multiple R-squared values were 35.41% for winning odds and 31.36% for placing odds. Both models' F-statistics confirmed statistical significance, validating the model's predictive reliability.  
+### Interpretation
 
-**Interpretation**: Significant negative coefficients suggest a mean-reverting dynamic in odds behavior, influenced by historical data. The positive correlation (0.6115) between the models' residuals underscores interconnected market movements.  
+The VAR analysis underscores the mean-reverting nature of both WIN and PLACE markets, with past price changes serving as strong predictors for future prices. The observed dynamics are predominantly market-specific with limited inter-market dependencies. This understanding enhances strategic betting decisions, leveraging historical data to predict future odds movements effectively.
 
-# References
 
 # Figures
 
@@ -441,6 +448,10 @@ Placing Odds: P_diff2 = 0.077(W_diff2.l1) + 0.037(W_diff2.l2) - 0.004(W_diff2.l3
 ![adf diff 1](figures/adf_diff1.png)
 
 ![adf diff 2](figures/adf_diff2.png)
+
+![VAR Summary 1](figures/var1.png)
+
+![VAR Summary 2](figures/var2.png)
 
 # Appendix
 
