@@ -23,32 +23,41 @@ knitr::opts_chunk$set(cache = TRUE, echo = FALSE, results = 'hide', warning = FA
 
 # Introduction
 
-Betting markets on betting exchanges are well suited for testing market efficiency, human rationality (including bias formation and classification), and time series-related algorithms(Lewis & Magee, 2011). Horse racing markets are especially useful for such analyses, as they are in abundance, liquid and fast to get results. The vast availability of live and historical data, such as prices (odds and the size of placed bets), provides a rich source for technical analysis. Additionally, other information, such as a horse’s recent form, genetics, and race conditions, can be used for fundamental analysis. Each bet has a specified termination point when its asset value is determined(Hausch & Ziemba, 2008).
+Betting markets on betting exchanges are well suited for testing market efficiency, human rationality (including bias formation and classification), and time series-related algorithms(Lewis & Magee, 2011). Horse racing markets are especially useful for such analyses, as they are in abundance, liquid and fast to get results. The vast availability of live and historical data, such as prices (odds and the size of placed bets), provides a rich source for technical analysis. Additionally, other information, such as a horse’s recent form, genetics, and race conditions, can be used for fundamental analysis. Each bet has a specified termination point when its asset value is determined
+(Hausch & Ziemba, 2008).  
 
-This study analyses the price data, specifically the odds and their implied probability on win and place markets for horse races. It focusses on the movement during the final minutes before a race starts. Actual trades were considered as the market price. To generate as many data points as possible, we chose the markets and times of the races with the highest liquidity. Data from Betfair, the world’s biggest betting exchange, is used, where the markets are much more efficient than at traditional bookmakers (Franck et al., 2013).  
+This study analyses the price data, specifically the odds and their implied probability on win and place markets for horse races. It focusses on the movement during the final minutes before a race starts. Actual trades were considered as the market price. To generate as many data points as possible, we chose the markets and times of the races with the highest liquidity. Data from Betfair, the world’s biggest betting exchange, is used, where the markets are much more efficient than at traditional bookmakers (Franck et al., 2013).
+
 
 # Literature Review
 
-Models that utilize win-market probabilities to predict place-market probabilities in horse racing have been developed and refined over the years. Two of the most notable models are Harville’s model, introduced in 1973, and Henery’s model, proposed in 1981. The Harville model is the simplest  model, and have been successfully implemented I the past (Hausch & Ziemba, 2008). It does however have a systemic bias of overestimating the placing probabilities of the favourite horses.
+Models that utilize win-market probabilities to predict place-market probabilities in horse racing have been developed and refined over the years. Two of the most notable models are Harville’s model, introduced in 1973, and Henery’s model, proposed in 1981. The Harville model is the simplest  model, and have been successfully implemented I the past (Hausch & Ziemba, 2008). It does however have a systemic bias of overestimating the placing probabilities of the favourite horses.  
 
-Time study analyses on Horse racing markets have been conducted and published. During this literature review, no publications were found that focusses on the causal relationships between different markets e.g. the win and place markets. (Tondapu, 2024) concluded that autocorrelation decays quickly, indicating high information efficiency however some volatility clustering are present indicating weaker efficiency.  
+Time study analyses on Horse racing markets have been conducted and published. During this literature review, no publications were found that focusses on the causal relationships between different markets e.g. the win and place markets. (Tondapu, 2024) concluded that autocorrelation decays quickly, indicating high information efficiency however some volatility clustering are present indicating weaker efficiency.
+ 
 
 # Methods
 
 The observation that place-markets are less liquid than win markets in horse racing has led to the hypothesis that win markets are more efficient, have a causal relationship with place markets, and can therefore be used for price discovery and market creation. The reasoning behind this hypothesis is based on the following points:  
 
-1. There are bigger spreads present in the place markets and desperate punters will bet at these spreads.
-2. Information is assumed to reflect faster in liquid markets as more participants are trading.  
+1)	There are bigger spreads present in the place markets and desperate punters will bet at these spreads. 
+2)	Information is assumed to reflect faster in liquid markets as more participants are trading.  
 
-The authors were so confident in this hypothesis that they developed a model in R, which connects to Betfair’s API to stream live win-market odds. They applied the Harville method to place bets in the place markets. The betting amounts were determined using the Kelly criterion, which balances risk and reward to optimize wealth.
+The authors were so confident in this hypothesis that they developed a model in R, which connects to Betfair’s API to stream live win-market odds. They applied the Harville method to place bets in the place markets. The betting amounts were determined using the Kelly criterion, which balances risk and reward to optimize wealth.  
 
-This was an example of a model being applied in the “danger zone” of Drew Conway’s data science Venn diagram (Conway, Drew, 2010). A contributing factor for "putting the cart before the horses", is that to live stream data through the Betfair API, is that one should place bets to have access. It cannot be used only to retrieve data, required for the analysis.  
+This was an example of a model being applied in the “danger zone” of Drew Conway’s data science Venn diagram (Conway, Drew, 2010). A contributing factor for "putting the cart before the horses", is that to live stream data through the Betfair API, is that one should place bets to have access. It cannot be used only to retrieve data, required for the analysis.
 
-The approach was changed, and the authors decided to perform time series analysis on historic data. The methods used were:  
+The approach was changed, and the authors decided to perform time series analysis on a historic race that took place in York on 15 May 2015. The price data of all six participating horses were analysed, however only the detailed analysis of one specific horse, Brown Panther, is described in this report:
+
 
 ## Data Collection and Preprocessing
 
-*Placeholder for data collection and preprocessing content.*
+The data source for this study was Betfair’s historical data, which is available through three pricing plans: Basic (free, 1-minute time frequency), Advanced (£69/month, 1-second time frequency), and Pro (£230/month, 50-millisecond time frequency). Pro plan data for May 2015 is available for free and was chosen for this study.  
+
+The selected race, held on May 15, 2015, met the criteria of having six runners, high liquidity (£2.43 million traded on the win market and £0.2 million on the place market), and no hurdles.  
+
+Each market is stored in a JSON file. The files for the selected race were retrieved and converted to a CSV file for analysis. The relevant fields included the UNIX timestamp, market identification, horse identification, last traded price, traded volume, an "in play" indicator, and a tuple containing the traded price and cumulative volume traded at that price. The study focused on analysing the actual trades over time, using fields like last traded price and volume only to verify and validate the data
+
 
 ```{r chunk_1}
 
@@ -137,6 +146,11 @@ PLACE_PRO_df_IP <- PLACE_PRO_df %>% filter(timestamp >= IP_t)
 ## Descriptive Analysis and Visualization
 
 Data was segmented by horse and market type (WIN, PLACE) to compute time-bucketed mean prices. Each horse's data was summarized over defined time buckets, and visualized to display price trends over time.
+
+The data hygiene and distributions were thoroughly explored and investigated for the two markets for each of the six horses. It was determined that the most critical processing step at this stage was to obtain as many equally spaced intervals as possible, with each interval containing at least one data point, particularly for the less liquid place markets. Key decisions needed to be made regarding the triggers influencing this process, specifically the chosen horse, the selected time period used, and the bin size:  
+
+The chosen horse was Brown Panther, the horse with the most trades (£1.19 mil in total). The bin size and time period were more difficult to determine, as the closer the time gets to the start of the race, the more liquid the markets become, hence shorter or narrower bins cans be used which implies more bins per time period, however shorter time periods. A trail and error approach was used to decide on 65 bins with a width of 9 seconds, hence a time period from 9.75 minutes before race start until race start.
+
 
 ```{r chunk_2}
 process_data <- function(data_df, market_type) {
@@ -298,6 +312,8 @@ plot(PLACE_price_ts, main="PLACE Price Time Series for Brown Panther", xlab="Tim
 
 The stationarity of WIN and PLACE price time series for Brown Panther was evaluated using the Augmented Dickey-Fuller (ADF) test, confirming non-stationarity as initial tests indicated p-values greater than 0.05. Subsequent decomposition using STL revealed seasonal components, depicted in plots for both markets. To achieve stationarity, first and second differencing were applied, followed by repeated ADF tests to assess each step's effectiveness in stabilizing the series.  
 
+After the data were explored and transformed into a timeseries with regular intervals by applying equal width binning, the Augmented Dicky-Fuller test was applied to the two series. The hypothesis could not be rejected that the series are non-stationary, and hence differencing was applied.
+
 \begin{figure}[!htb]
 \centering
 \begin{minipage}{0.5\textwidth}
@@ -414,7 +430,7 @@ A VAR model was applied to Brown Panther's differenced WIN and PLACE price data 
 
 ### Interpretation
 
-The VAR analysis underscores the mean-reverting nature of both WIN and PLACE markets, with past price changes serving as strong predictors for future prices. The observed dynamics are predominantly market-specific with limited inter-market dependencies. This understanding enhances strategic betting decisions, leveraging historical data to predict future odds movements effectively.
+The VAR analysis underscores the mean-reverting nature of both WIN and PLACE markets, with past price changes serving as strong predictors for future prices. The observed dynamics are predominantly market-specific with limited inter-market dependencies. This understanding enhances strategic betting decisions, leveraging historical data to predict future odds movements effectively. The hypothesis that win markets are more efficient, have a causal relationship with place markets, and can therefore be used for price discovery and market creation is rejected based on this analysis. The win-price and place-price for Brown Panther has a correlation of 0.95 however as mentioned very little causality. This is yet another example that demonstrates that correlation does not imply causation.
 
 
 # Figures
