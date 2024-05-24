@@ -442,6 +442,7 @@ The hypothesis that win markets are more efficient, have a causal relationship w
 
 The limitations of this study is that the time series analysis was only conducted on one horse race due to time constraints. Future investigations will be conducted on the causal relationship between the win market and the available trades in the place market, not only on actual trades.
 
+![WIN-PLACE CAUSALITY RESULT](figures/GrangerCausResult.png)
 
 \newpage
 
