@@ -606,11 +606,8 @@ Tondapu, N. (2024). Efficient Market Dynamics: Unraveling Informational Efficien
 
 
 
+\clearpage
 
-
-
-
-\newpage
 # Appendix C: Time Series Analysis Results
 
 
@@ -619,6 +616,10 @@ Tondapu, N. (2024). Efficient Market Dynamics: Unraveling Informational Efficien
 ![adf diff 1](figures/adf_diff1.png)
 
 ![adf diff 2](figures/adf_diff2.png)
+
+![Stationary Win TS Snow Sky](figures/win-diff.png)
+
+![Stationary Place TS Snow Sky](figures/place-diff.png)
 
 ![VAR Summary 1](figures/var1.png)
 
